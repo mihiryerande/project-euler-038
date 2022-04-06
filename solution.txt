@@ -1,0 +1,118 @@
+Problem 38 Solution:
+
+The solution can be worked out by hand, without any coding.
+
+Goal:
+    Want a 1-to-9 pandigital number,
+      which is the concatenated product of...
+        * Natural number `f`
+        * Range (1, 2, ..., n), where n > 1
+
+Known Information:
+    9 * (1,2,3,4,5) --> 918273645
+
+Constructing Solution:
+    Let the desired pandigital concatenated product answer be labelled `p`,
+      which is the concatenated product of `f` and (1, ..., `n`)
+    Attempt to construct satisfactory {f, n, p} by considering digits 1 through 9.
+
+    p must be 9 digits long and use all digits 1 to 9 exactly once.
+    First digit of p must be 9
+        * Answer is at least 918273645.
+        * 918273645 <= p < 10^9
+        * p = '9 _ _ _ _ _ _ _ _'
+
+    f must be exactly 4 digits long:
+        Consider various lengths (digit-counts) of f
+            * 1 digit?
+                --> The only possible product is 9 * (1,2,3,4,5), which we already know
+                --> Ignore 1 digit long
+            * 2 digits?
+                --> f = '9 _'
+                --> Since f is 90-something, the further multiples (2*f, 3*f, etc.) will have 3 digits
+                --> Can't concat to produce a 9-digit number, as we can only get digit-count of 2+3+3 = 8 or 2+3+3+3 = 11
+                --> f can't be 2 digits long
+            * 3 digits?
+                --> f = '9 _ _'
+                --> Since f is 900-something, the further multiples (2*f, 3*f, etc.) will have 4 digits
+                --> Can't concat to produce a 9-digit number, as we can only get digit-count of 3+4 = 7 or 3+4+4 = 11
+                --> f can't be 3 digits long
+            * 5 or more digits?
+                --> f = '9 _ _ _ _'
+                --> Since f is 90000-something, next multiple (2*f) will also be at least 5 digits long
+                --> Can't concat to produce a 9-digit number, as we would exceed 9 digits
+                --> f can't be 5 or more digits long
+            * 4 digits?
+                --> f = '9 _ _ _'
+                --> Since f is 9000-something, next multiple (2*f) will be 5 digits long
+                --> This could work if n=2, giving total concatenated product length of 4+5 = 9 digits
+                --> f can only be 4 digits long
+
+        -> Format of p is concat(f, 2*f) = '9 _ _ _ | _ _ _ _ _'
+
+    Whittling down possibilities for digits:
+        p = concat(f, 2*f) = '9 _ _ _ | 1 _ _ _ _'
+            *   f >=  9000
+            * 2*f >= 18000
+
+        p = '9 _ _ _ | 1 8 _ _ _'
+            * f < 9500
+            * Suppose 9500 < f < 10000, then 19000 < 2*f < 20000
+            * Second digit of 2*f would be 9
+            * Can't have this since the digit '9' would appear twice in p
+
+        p = '9 [234567] [234567] [234567] | 1 8 [234567] [234567] [234567]'
+            * Remaining digits to fill in are {2,3,4,5,6,7}
+
+        p = '9 [234567] [234567] [2367] | 1 8 [234567] [234567] [246]'
+            * Last digit of 2*f must be even
+                --> Must be in [246]
+            * Last digit of f needs to match up with these possibilities
+                --> Must be in [2367]
+
+        p = '9 [23] [234567] [2367] | 1 8 [4567] [234567] [246]'
+            * f < 9500
+                --> Second digit of f must be less than 5
+                --> Second digit must be in [234]
+            * Second digit of f can't be 4, as third digit of 2*f would have to be 8 or 9
+            * Third digit of 2*f can then only be in [4567]
+
+        p = '9 [23] [23467] [2367] | 1 8 [234567] [234567] [246]'
+            * Third digit of f can't be 5, as fourth digit of 2*f would have to be 0 or 1
+
+        p = '9 [23] [23467] [2367] | 1 8 [4567] [234567] [246]'
+            * Third digit of 2*f can't be 2 or 3
+
+        Only 2 options for where 5 can go:
+            (Case 1):
+                Let 3rd digit of 2*f be 5:
+                    --> p = '9 [23] [23467] [2367] | 1 8 5 [23467] [246]'   # Set third digit of 2*f as 5
+                    --> p = '9 2 [3467] [367] | 1 8 5 [3467] [46]'          # Second digit of f can only be 2
+                    --> p = '9 2 [67] [367] | 1 8 5 [3467] [46]'            # Third digit of f must can't be 3 or 4
+                    --> p = '9 2 [67] [367] | 1 8 5 [34] [46]'              # Fourth digit of 2*f must can't be 6 or 7
+
+                Two possible options based on where '4' is placed:
+                    (Case 1a):  p = '9 2 6 7 | 1 8 5 3 4'
+                    (Case 1b):  p = '9 2 7 3 | 1 8 5 4 6'
+                Both of these are candidate answers.
+
+            (Case 2):
+                Let 4th digit of 2*f be 5:
+                    --> p = '9 [23] [23467] [2367] | 1 8 [467] 5 [246]'     # Set fourth digit of 2*f as 5
+                    --> p = '9 [23] [27] [2367] | 1 8 [467] 5 [246]'        # Third digit of f can only be 2 or 7
+                    --> p = '9 [23] [27] [67] | 1 8 [467] 5 [246]'          # Last digit of f can only be 6 or 7
+                    --> p = '9 [23] [27] [67] | 1 8 [467] 5 [24]'           # Last digit of 2*f can't be 6
+                    --> p = '9 3 [27] [67] | 1 8 [467] 5 [24]'              # Only place to put '3' is second digit of f
+                    --> p = '9 3 [27] [67] | 1 8 [67] 5 [24]'               # Third digit of 2*f can't be 4
+                    --> p = '9 3 [27] [67] | 1 8 [67] 5 4'                  # Only place to put '4' is last digit of 2*f
+                    --> p = '9 3 2 7 | 1 8 6 5 4'                           # Last digit of f must be 7
+
+                Another candidate answer: p = '9 3 2 7 | 1 8 6 5 4'
+
+    Candidates found:
+        * 918273645 =    9 * (1,2,3,4,5)   (Given in problem description)
+        * 926718534 = 9267 * (1,2)         (Case 1a)
+        * 927318546 = 9273 * (1,2)         (Case 1b)
+        * 932718654 = 9327 * (1,2)         (Case 2)
+
+    Maximum among candidates is 932718654 □
