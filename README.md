@@ -1,4 +1,4 @@
-# Projct Euler - Problem 38 - Pandigital Multiples
+# Project Euler - Problem 38 - Pandigital Multiples
 Take the number `192` and multiply it by each of `1`, `2`, and `3`:
 
     192 × 1 = 192
